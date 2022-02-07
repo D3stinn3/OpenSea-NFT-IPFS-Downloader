@@ -4,18 +4,27 @@ import json
 import math
 from random_user_agent.user_agent import UserAgent
 from random_user_agent.params import SoftwareName, OperatingSystem
+import ujson
+import random
+from fake_useragent import UserAgent
+import cloudscraper
+
+scraper = cloudscraper.create_scraper(
+    browser={
+        'browser': 'firefox',
+        'platform': 'windows',
+        'mobile': False
+    }
+)
+
 
 # This is where you add the collection name to the URL
-CollectionName = "Collection Name".lower()
-
-# Random User Agent
-software_names = [SoftwareName.CHROME.value]
-operating_systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value]
-user_agent_rotator = UserAgent(software_names=software_names, operating_systems=operating_systems, limit=100)
-user_agent = user_agent_rotator.get_random_user_agent()
+CollectionName = "doodles-official".lower()
 
 # Headers for the request. Currently this is generating random user agents
-# Use a custom header version here -> https://www.whatismybrowser.com/guides/the-latest-user-agent/
+# Use a custom header version here -> 
+
+user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"
 headers = {
       'User-Agent': user_agent,
       "Accept": "application/json"
@@ -24,6 +33,7 @@ headers = {
 # Get information regarding collection
 
 collection = requests.get(f"http://api.opensea.io/api/v1/collection/{CollectionName}?format=json")
+print(collection)
 
 if collection.status_code == 429:
     print("Server returned HTTP 429. Request was throttled. Please try again in about 5 minutes.")
@@ -96,14 +106,28 @@ def ipfs_resolve(image_url):
       break
   return request
 
+# Modified to just get the ids that we need if you want every unit, you can use previous code
 # Iterate through every unit
-for i in range(iter):
-    offset = i * 30
-    token_ids = ""
-    for i in range(offset, offset+30):
-      token_ids += f"&token_ids={i}"
+#for i in range(iter):
 
-    data = json.loads(requests.get(f"https://api.opensea.io/api/v1/assets?order_direction=asc{token_ids}&limit=50&collection={CollectionName}&format=json", headers=headers).content.decode())
+list = [1]
+
+for i in list:
+    offset = i * 30
+    token_ids = "&token_ids=4644&token_ids=4796&token_ids=5207&token_ids=5789&token_ids=6000&token_ids=6081&token_ids=6094&token_ids=6144&token_ids=6400&token_ids=6878&token_ids=7081&token_ids=7509&token_ids=7628&token_ids=7648&token_ids=834&token_ids=8500&token_ids=9668&token_ids=8982&token_ids=9351&token_ids=9398&token_ids=9418&token_ids=9590&token_ids=9614"
+    #for i in range(offset, offset+30):
+    #  token_ids += f"&token_ids={i}"
+
+    url = f"https://api.opensea.io/api/v1/assets?order_direction=asc{token_ids}&limit=50&collection={CollectionName}&format=json"
+    print(url)
+    #thedata = scraper.get(url)
+
+    #thedata = requests.get(url, headers=headers)
+    #print("The Data:")
+    #print(thedata)
+    data = json.loads(scraper.get(url).text)
+
+    #data = json.loads(requests.get(f"https://api.opensea.io/api/v1/assets?order_direction=asc{token_ids}&limit=50&collection={CollectionName}&format=json", headers=headers).content.decode())
 
     if "assets" in data:
         for asset in data["assets"]:
