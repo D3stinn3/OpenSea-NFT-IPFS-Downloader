@@ -2,11 +2,6 @@ import requests
 import os
 import json
 import math
-from random_user_agent.user_agent import UserAgent
-from random_user_agent.params import SoftwareName, OperatingSystem
-import ujson
-import random
-from fake_useragent import UserAgent
 import cloudscraper
 
 scraper = cloudscraper.create_scraper(
